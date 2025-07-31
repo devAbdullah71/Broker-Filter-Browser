@@ -150,7 +150,7 @@
             }
 
             .location-input {
-                font-size: 16px;
+                font-size: 15px;
                 width: 300px;
                 max-width: 100%;
                 border-radius: 0px;
@@ -196,6 +196,42 @@
 
         const locationsByState = {
             'Alabama': ['Bessemer', 'Dothan', 'Florence', 'Muscle Shoals', 'Russellville', 'Tuscaloosa'],
+            'Arkansas': ['Conway', 'Fayetteville', 'Jonesboro', 'Pine Bluff', 'Rogers', 'Russellville', 'Ft. Smith'],
+            'California': ['Bay Area', 'Fresno', 'Los Angeles', 'Modesto', 'Sacramento', 'San Diego', 'San Jose', 'Santa Barbara'],
+            'Florida': ['Ft. Lauderdale', 'Hollywood', 'Miami', 'Orlando', 'Punta Gorda', 'Tampa', 'Vero Beach'],
+            'Georgia': ['Augusta', 'Brunswick', 'Conyers', 'Eastern ATL suburbs', 'Fayetteville', 'Griffin', 'Macon', 'Statesboro', 'Valdosta'],
+            'Idaho': ['Idaho Falls', 'Pocatello', 'Twin Falls'],
+            'Illinois': ['Bloomingdale', 'Champaign', 'Chicago suburbs: Deer Park', 'Dekalb', 'Joliet', 'Rockford'],
+            'Indiana': ['Bloomington', 'Elkhart/Goshen', 'Evansville', 'Ft. Wayne', 'Lafayette', 'Muncie', 'South Bend/Mishawaka', 'Valparaiso', 'Youngstown'],
+            'Iowa': ['Cedar Rapids/Waterloo', 'Davenport', 'Des Moines', 'Iowa City', 'Sioux City'],
+            'Kansas': ['Manhattan', 'Overland Park', 'Topeka', 'Wichita'],
+            'Kentucky': ['Florence', 'Frankfort', 'Louisville', 'Owensboro'],
+            'Louisiana': ['Baton Rouge', 'Houma', 'Lake Charles', 'New Orleans', 'Shreveport', 'Slidell'],
+            'Maryland': ['Hagerstown', 'West Laurel'],
+            'Massachusetts': ['Brockton/Weymouth', 'Lowell/Grove', 'Springfield/Amherst'],
+            'Michigan': ['Ann Arbor', 'Battle Creek/Jackson', 'Dearborn', 'Mt. Pleasant', 'Pontiac', 'Traverse City', 'Warren/Sterling Heights/Clinton', 'Waterford Twp', 'Muskegon/Holland'],
+            'Minnesota': ['Duluth', 'Mankato', 'Minneapolis/St. Paul–great fur open', 'Rochester'],
+            'Mississippi': ['Clarksdale', 'Gulfport/Pascagoula', 'Hattiesburg', 'Starkville/Columbus'],
+            'Missouri': ['Columbia', 'Jefferson City', 'Kansas City', 'St. Joseph'],
+            'Montana': ['Billings', 'Bozeman'],
+            'Nebraska': ['Lincoln'],
+            'New Hampshire': ['Concord', 'Manchester'],
+            'New York': ['Albany/Troy', 'Binghamton', 'Syracuse', 'Utica'],
+            'North Carolina': ['Asheville', 'Charlotte', 'Fayetteville', 'Goldsboro', 'Greenville', 'High Point', 'Rocky Mount', 'Statesville'],
+            'North Dakota': ['Bismarck'],
+            'Ohio': ['Akron/Canton', 'Cincinnati (good turf still open East suburbs)', 'Columbus', 'Dayton/Springfield', 'Lima', 'Mansfield', 'Toledo', 'Youngstown'],
+            'Oklahoma': ['Stillwater', 'Tulsa'],
+            'Oregon': ['Eugene', 'Portland', 'Salem'],
+            'Pennsylvania': ['Carlisle', 'Harrisburg', 'New Castle', 'Pittsburgh', 'Williamsport', 'York'],
+            'South Carolina': ['Anderson', 'Spartanburg', 'Sumter'],
+            'South Dakota': ['Rapid City'],
+            'Tennessee': ['Gatlinburg/Lake Jackson', 'Huntsville', 'Lake Charles', 'Paducah/Bryan/College Station'],
+            'Texas': ['Amarillo', 'Austin', 'Corpus Christi', 'Dallas/Ft. Worth', 'Houston', 'San Angelo', 'San Antonio'],
+            'Vermont': ['Burlington', 'Montpelier'],
+            'Virginia': ['Charlottesville', 'Hampton', 'Northern Neck', 'Norfolk', 'Petersburg', 'Prince George', 'Suffolk', 'Williamsburg'],
+            'Washington': ['Bellingham', 'Seattle', 'Tacoma'],
+            'West Virginia': ['Parkersburg', 'Wheeling'],
+            'Wisconsin': ['Eau Claire', 'Green Bay', 'Milwaukee', 'Oshkosh/Appleton', 'Sheboygan', 'Stevens Point', 'Wausau']
         };
 
         document.getElementById('checkBtn').addEventListener('click', () => {
