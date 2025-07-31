@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location Availability Checker</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        input {
+            padding: 0.5em;
+            font-size: 1em;
+            width: 300px;
+        }
+
+        button {
+            margin-top: 1em;
+            padding: 0.5em 1em;
+            font-size: 1em;
+        }
+
+        .result {
+            margin-top: 2em;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .suggestions {
+            margin-top: 1em;
+            text-align: left;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <input id="locationInput" placeholder="Enter location State,City" />
+    <button id="checkBtn">Check Availability</button>
+    <div id="result" class="result"></div>
+
+    <script>
+        const locationsByState = {
+            'Alabama': ['Bessemer', 'Dothan', 'Florence', 'Muscle Shoals', 'Russellville', 'Tuscaloosa'],
+            'Arkansas': ['Conway', 'Fayetteville', 'Jonesboro', 'Pine Bluff', 'Rogers', 'Russellville', 'Ft. Smith'],
+            'California': ['Bay Area', 'Fresno', 'Los Angeles', 'Modesto', 'Sacramento', 'San Diego', 'San Jose', 'Santa Barbara'],
+            'Florida': ['Ft. Lauderdale', 'Hollywood', 'Miami', 'Orlando', 'Punta Gorda', 'Tampa', 'Vero Beach'],
+            'Georgia': ['Augusta', 'Brunswick', 'Conyers', 'Eastern ATL suburbs', 'Fayetteville', 'Griffin', 'Macon', 'Statesboro', 'Valdosta'],
+            'Idaho': ['Idaho Falls', 'Pocatello', 'Twin Falls'],
+            'Illinois': ['Bloomingdale', 'Champaign', 'Chicago suburbs: Deer Park', 'Dekalb', 'Joliet', 'Rockford'],
+            'Indiana': ['Bloomington', 'Elkhart/Goshen', 'Evansville', 'Ft. Wayne', 'Lafayette', 'Muncie', 'South Bend/Mishawaka', 'Valparaiso', 'Youngstown'],
+            'Iowa': ['Cedar Rapids/Waterloo', 'Davenport', 'Des Moines', 'Iowa City', 'Sioux City'],
+            'Kansas': ['Manhattan', 'Overland Park', 'Topeka', 'Wichita'],
+            'Kentucky': ['Florence', 'Frankfort', 'Louisville', 'Owensboro'],
+            'Louisiana': ['Baton Rouge', 'Houma', 'Lake Charles', 'New Orleans', 'Shreveport', 'Slidell'],
+            'Maryland': ['Hagerstown', 'West Laurel'],
+            'Massachusetts': ['Brockton/Weymouth', 'Lowell/Grove', 'Springfield/Amherst'],
+            'Michigan': ['Ann Arbor', 'Battle Creek/Jackson', 'Dearborn', 'Mt. Pleasant', 'Pontiac', 'Traverse City', 'Warren/Sterling Heights/Clinton', 'Waterford Twp', 'Muskegon/Holland'],
+            'Minnesota': ['Duluth', 'Mankato', 'Minneapolis/St. Paul–great fur open', 'Rochester'],
+            'Mississippi': ['Clarksdale', 'Gulfport/Pascagoula', 'Hattiesburg', 'Starkville/Columbus'],
+            'Missouri': ['Columbia', 'Jefferson City', 'Kansas City', 'St. Joseph'],
+            'Montana': ['Billings', 'Bozeman'],
+            'Nebraska': ['Lincoln'],
+            'New Hampshire': ['Concord', 'Manchester'],
+            'New York': ['Albany/Troy', 'Binghamton', 'Syracuse', 'Utica'],
+            'North Carolina': ['Asheville', 'Charlotte', 'Fayetteville', 'Goldsboro', 'Greenville', 'High Point', 'Rocky Mount', 'Statesville'],
+            'North Dakota': ['Bismarck'],
+            'Ohio': ['Akron/Canton', 'Cincinnati (good turf still open East suburbs)', 'Columbus', 'Dayton/Springfield', 'Lima', 'Mansfield', 'Toledo', 'Youngstown'],
+            'Oklahoma': ['Stillwater', 'Tulsa'],
+            'Oregon': ['Eugene', 'Portland', 'Salem'],
+            'Pennsylvania': ['Carlisle', 'Harrisburg', 'New Castle', 'Pittsburgh', 'Williamsport', 'York'],
+            'South Carolina': ['Anderson', 'Spartanburg', 'Sumter'],
+            'South Dakota': ['Rapid City'],
+            'Tennessee': ['Gatlinburg/Lake Jackson', 'Huntsville', 'Lake Charles', 'Paducah/Bryan/College Station'],
+            'Texas': ['Amarillo', 'Austin', 'Corpus Christi', 'Dallas/Ft. Worth', 'Houston', 'San Angelo', 'San Antonio'],
+            'Vermont': ['Burlington', 'Montpelier'],
+            'Virginia': ['Charlottesville', 'Hampton', 'Northern Neck', 'Norfolk', 'Petersburg', 'Prince George', 'Suffolk', 'Williamsburg'],
+            'Washington': ['Bellingham', 'Seattle', 'Tacoma'],
+            'West Virginia': ['Parkersburg', 'Wheeling'],
+            'Wisconsin': ['Eau Claire', 'Green Bay', 'Milwaukee', 'Oshkosh/Appleton', 'Sheboygan', 'Stevens Point', 'Wausau']
+        };
+
+        document.getElementById('checkBtn').addEventListener('click', () => {
+            const input = document.getElementById('locationInput').value.trim();
+            const resultEl = document.getElementById('result');
+            resultEl.innerHTML = '';
+
+            if (!/^[A-Za-z ,]+$/.test(input)) {
+                resultEl.textContent = 'Invalid input. Use letters only.';
+                return;
+            }
+
+            const [stateRaw, cityRaw] = input.split(',').map(s => s.trim());
+            if (!stateRaw || !cityRaw) {
+                resultEl.textContent = 'Please enter both State and City.';
+                return;
+            }
+            const state = stateRaw;
+            const city = cityRaw;
+
+            const cities = locationsByState[state];
+            if (!cities) {
+                resultEl.textContent = 'Unavailable';
+                return;
+            }
+
+            if (cities.includes(city)) {
+                resultEl.textContent = 'Available';
+            } else {
+                const suggestions = cities.slice(0, 3);
+                let html = '<p>Unfortunately your requested location is unavailable, but we do have other options:</p>';
+                html += '<ul class="suggestions">';
+                suggestions.forEach(opt => {
+                    html += `<li>${state}, ${opt}</li>`;
+                });
+                html += '</ul>';
+                resultEl.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+
+</html>

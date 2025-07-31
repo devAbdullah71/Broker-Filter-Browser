@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location Availability Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                radial-gradient(circle at 25% 75%, rgba(255, 0, 0, 0.16), transparent 60%),
+                radial-gradient(circle at 75% 25%, rgba(255, 0, 0, 0.08), transparent 60%),
+                linear-gradient(135deg, #000000, #020202);
+            background-blend-mode: screen, screen, normal;
+            position: relative;
+        }
+
+        .header {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 55px;
+            font-weight: 600;
+            color: white;
+            line-height: 1;
+        }
+
+        .header img {
+            height: 40px;
+            width: 40px;
+        }
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .location-input {
+            position: relative;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+            width: 400px;
+            max-width: 90%;
+            font-size: 20px;
+            color: white;
+            padding: 10px 0;
+            outline: none;
+            text-align: left;
+            /* only the bottom border pulses */
+            animation: pulse-underline 2.5s infinite ease-in-out;
+        }
+
+        .location-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+            text-align: left;
+        }
+
+        @keyframes pulse-underline {
+
+            0%,
+            100% {
+                border-bottom-color: rgba(255, 255, 255, 0.9);
+            }
+
+            50% {
+                border-bottom-color: rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .check-btn {
+            margin-top: 45px;
+            padding: 15px 40px;
+            font-size: 17px;
+            font-weight: 300;
+            color: white;
+            background: linear-gradient(135deg, #330000 0%, #660000 50%, #330000 100%);
+            border: none;
+            border-radius: 15px;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s ease;
+        }
+
+        .check-btn:hover {
+            background: #333333;
+        }
+
+        #result {
+            margin-top: 45px;
+            font-size: 24px;
+            font-weight: 300;
+            color: white;
+            text-align: center;
+            opacity: 0;
+        }
+
+        #result ul {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            list-style-type: disc;
+            list-style-position: inside;
+            margin-top: 10px;
+            padding: 0;
+        }
+
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cursor" id="cursor"></div>
+
+    <div class="header">
+        <h1>Franchise Rocket IO</h1>
+        <img src="Assests/LOGO-icon-col2.png" alt="Rocket Logo">
+    </div>
+
+    <div class="form-wrapper">
+        <input id="locationInput" class="location-input" placeholder="Enter location e.g State, City" />
+        <button id="checkBtn" class="check-btn">Check Availability</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', e => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.4,
+                ease: "power1.out"
+            });
+        });
+
+        const locationsByState = {
+            'Alabama': ['Bessemer', 'Dothan', 'Florence', 'Muscle Shoals', 'Russellville', 'Tuscaloosa'],
+            'Arkansas': ['Conway', 'Fayetteville', 'Jonesboro', 'Pine Bluff', 'Rogers', 'Russellville', 'Ft. Smith'],
+            'California': ['Bay Area', 'Fresno', 'Los Angeles', 'Modesto', 'Sacramento', 'San Diego', 'San Jose', 'Santa Barbara'],
+            'Florida': ['Ft. Lauderdale', 'Hollywood', 'Miami', 'Orlando', 'Punta Gorda', 'Tampa', 'Vero Beach'],
+            'Georgia': ['Augusta', 'Brunswick', 'Conyers', 'Eastern ATL suburbs', 'Fayetteville', 'Griffin', 'Macon', 'Statesboro', 'Valdosta'],
+            'Idaho': ['Idaho Falls', 'Pocatello', 'Twin Falls'],
+            'Illinois': ['Bloomingdale', 'Champaign', 'Chicago suburbs: Deer Park', 'Dekalb', 'Joliet', 'Rockford'],
+            'Indiana': ['Bloomington', 'Elkhart/Goshen', 'Evansville', 'Ft. Wayne', 'Lafayette', 'Muncie', 'South Bend/Mishawaka', 'Valparaiso', 'Youngstown'],
+            'Iowa': ['Cedar Rapids/Waterloo', 'Davenport', 'Des Moines', 'Iowa City', 'Sioux City'],
+            'Kansas': ['Manhattan', 'Overland Park', 'Topeka', 'Wichita'],
+            'Kentucky': ['Florence', 'Frankfort', 'Louisville', 'Owensboro'],
+            'Louisiana': ['Baton Rouge', 'Houma', 'Lake Charles', 'New Orleans', 'Shreveport', 'Slidell'],
+            'Maryland': ['Hagerstown', 'West Laurel'],
+            'Massachusetts': ['Brockton/Weymouth', 'Lowell/Grove', 'Springfield/Amherst'],
+            'Michigan': ['Ann Arbor', 'Battle Creek/Jackson', 'Dearborn', 'Mt. Pleasant', 'Pontiac', 'Traverse City', 'Warren/Sterling Heights/Clinton', 'Waterford Twp', 'Muskegon/Holland'],
+            'Minnesota': ['Duluth', 'Mankato', 'Minneapolis/St. Paul–great fur open', 'Rochester'],
+            'Mississippi': ['Clarksdale', 'Gulfport/Pascagoula', 'Hattiesburg', 'Starkville/Columbus'],
+            'Missouri': ['Columbia', 'Jefferson City', 'Kansas City', 'St. Joseph'],
+            'Montana': ['Billings', 'Bozeman'],
+            'Nebraska': ['Lincoln'],
+            'New Hampshire': ['Concord', 'Manchester'],
+            'New York': ['Albany/Troy', 'Binghamton', 'Syracuse', 'Utica'],
+            'North Carolina': ['Asheville', 'Charlotte', 'Fayetteville', 'Goldsboro', 'Greenville', 'High Point', 'Rocky Mount', 'Statesville'],
+            'North Dakota': ['Bismarck'],
+            'Ohio': ['Akron/Canton', 'Cincinnati (good turf still open East suburbs)', 'Columbus', 'Dayton/Springfield', 'Lima', 'Mansfield', 'Toledo', 'Youngstown'],
+            'Oklahoma': ['Stillwater', 'Tulsa'],
+            'Oregon': ['Eugene', 'Portland', 'Salem'],
+            'Pennsylvania': ['Carlisle', 'Harrisburg', 'New Castle', 'Pittsburgh', 'Williamsport', 'York'],
+            'South Carolina': ['Anderson', 'Spartanburg', 'Sumter'],
+            'South Dakota': ['Rapid City'],
+            'Tennessee': ['Gatlinburg/Lake Jackson', 'Huntsville', 'Lake Charles', 'Paducah/Bryan/College Station'],
+            'Texas': ['Amarillo', 'Austin', 'Corpus Christi', 'Dallas/Ft. Worth', 'Houston', 'San Angelo', 'San Antonio'],
+            'Vermont': ['Burlington', 'Montpelier'],
+            'Virginia': ['Charlottesville', 'Hampton', 'Northern Neck', 'Norfolk', 'Petersburg', 'Prince George', 'Suffolk', 'Williamsburg'],
+            'Washington': ['Bellingham', 'Seattle', 'Tacoma'],
+            'West Virginia': ['Parkersburg', 'Wheeling'],
+            'Wisconsin': ['Eau Claire', 'Green Bay', 'Milwaukee', 'Oshkosh/Appleton', 'Sheboygan', 'Stevens Point', 'Wausau']
+        };
+
+        document.getElementById('checkBtn').addEventListener('click', () => {
+            const input = document.getElementById('locationInput').value.trim();
+            const resultEl = document.getElementById('result');
+            resultEl.innerHTML = '';
+            resultEl.style.opacity = 0;
+
+            if (!/^[A-Za-z ,]+$/.test(input)) {
+                resultEl.textContent = 'Invalid input. Use letters only.';
+                return fadeIn();
+            }
+
+            const [stateRaw, cityRaw] = input.split(',').map(s => s.trim());
+            if (!stateRaw || !cityRaw) {
+                resultEl.textContent = 'Please enter both State and City.';
+                return fadeIn();
+            }
+
+            const state = stateRaw, city = cityRaw;
+            const cities = locationsByState[state];
+
+            if (!cities) {
+                resultEl.textContent = 'Unavailable';
+                return fadeIn();
+            }
+
+            if (cities.includes(city)) {
+                resultEl.textContent = 'Available';
+            } else {
+                let html = 'Unfortunately your requested location is unavailable, but we do have other options:';
+                html += '<ul>';
+                cities.slice(0, 3).forEach(opt => {
+                    html += `<li>${state}, ${opt}</li>`;
+                });
+                html += '</ul>';
+                resultEl.innerHTML = html;
+            }
+
+            fadeIn();
+        });
+
+        function fadeIn() {
+            gsap.to('#result', { opacity: 1, duration: 0.5, ease: 'power1.out' });
+        }
+    </script>
+</body>
+
+</html>
