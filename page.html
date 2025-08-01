@@ -152,8 +152,6 @@
             .location-input {
                 font-size: 15px;
                 width: 300px;
-                max-width: 100%;
-                border-radius: 0px;
             }
 
             .check-btn {
@@ -169,32 +167,23 @@
 </head>
 
 <body>
-
     <div class="cursor" id="cursor"></div>
-
     <div class="header">
         <h1>Franchise Rocket IO</h1>
         <img src="Assests/LOGO-icon-col2.png" alt="Rocket Logo">
     </div>
-
     <div class="form-wrapper">
-        <input id="locationInput" class="location-input" placeholder="Enter location e.g State, City" />
+        <input id="locationInput" class="location-input" placeholder="Enter location e.g State, City or City, State" />
         <button id="checkBtn" class="check-btn">Check Availability</button>
         <div id="result"></div>
     </div>
-
     <script>
         const cursor = document.getElementById('cursor');
         document.addEventListener('mousemove', e => {
-            gsap.to(cursor, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.4,
-                ease: "power1.out"
-            });
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.4, ease: "power1.out" });
         });
 
-        const locationsByState = {
+        const rawMap = {
             'Alabama': ['Bessemer', 'Dothan', 'Florence', 'Muscle Shoals', 'Russellville', 'Tuscaloosa'],
             'Arkansas': ['Conway', 'Fayetteville', 'Jonesboro', 'Pine Bluff', 'Rogers', 'Russellville', 'Ft. Smith'],
             'California': ['Bay Area', 'Fresno', 'Los Angeles', 'Modesto', 'Sacramento', 'San Diego', 'San Jose', 'Santa Barbara'],
@@ -233,6 +222,10 @@
             'West Virginia': ['Parkersburg', 'Wheeling'],
             'Wisconsin': ['Eau Claire', 'Green Bay', 'Milwaukee', 'Oshkosh/Appleton', 'Sheboygan', 'Stevens Point', 'Wausau']
         };
+        const locationsByState = {};
+        for (let state in rawMap) {
+            locationsByState[state.toLowerCase()] = rawMap[state].map(c => c.toLowerCase());
+        }
 
         document.getElementById('checkBtn').addEventListener('click', () => {
             const input = document.getElementById('locationInput').value.trim();
@@ -241,36 +234,33 @@
             resultEl.style.opacity = 0;
 
             if (!/^[A-Za-z ,]+$/.test(input)) {
-                resultEl.textContent = 'Invalid input. Use letters only.';
-                return fadeIn();
+                resultEl.textContent = 'Invalid input. Use letters only.'; return fadeIn();
             }
 
-            const [stateRaw, cityRaw] = input.split(',').map(s => s.trim());
-            if (!stateRaw || !cityRaw) {
-                resultEl.textContent = 'Please enter both State and City.';
-                return fadeIn();
+            const parts = input.split(',').map(s => s.trim().toLowerCase());
+            if (parts.length < 2) {
+                resultEl.textContent = 'Please enter State and City.'; return fadeIn();
+            }
+            let [first, second] = parts;
+            let state, city;
+            if (locationsByState[first] && locationsByState[first].includes(second)) {
+                state = first; city = second;
+            } else if (locationsByState[second] && locationsByState[second].includes(first)) {
+                state = second; city = first;
+            } else {
+                resultEl.textContent = 'Unavailable'; return fadeIn();
             }
 
-            const state = stateRaw, city = cityRaw;
-            const cities = locationsByState[state];
-
-            if (!cities) {
-                resultEl.textContent = 'Unavailable';
-                return fadeIn();
-            }
-
-            if (cities.includes(city)) {
+            if (locationsByState[state].includes(city)) {
                 resultEl.textContent = 'Available';
             } else {
+                const opts = rawMap[state.charAt(0).toUpperCase() + state.slice(1)].slice(0, 3);
                 let html = 'Unfortunately your requested location is unavailable, but we do have other options:';
                 html += '<ul>';
-                cities.slice(0, 3).forEach(opt => {
-                    html += `<li>${state}, ${opt}</li>`;
-                });
+                opts.forEach(opt => html += `<li>${state.charAt(0).toUpperCase() + state.slice(1)}, ${opt}</li>`);
                 html += '</ul>';
                 resultEl.innerHTML = html;
             }
-
             fadeIn();
         });
 
