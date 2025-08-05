@@ -25,7 +25,7 @@
             background-image:
                 radial-gradient(circle at 25% 75%, rgba(255, 0, 0, 0.16), transparent 60%),
                 radial-gradient(circle at 75% 25%, rgba(255, 0, 0, 0.08), transparent 60%),
-                linear-gradient(135deg, #000000, #020202);
+                linear-gradient(135deg, #000, #020202);
             background-blend-mode: screen, screen, normal;
             position: relative;
         }
@@ -44,13 +44,12 @@
         .header h1 {
             font-size: 55px;
             font-weight: 600;
-            color: white;
-            line-height: 1;
+            color: #fff;
         }
 
         .header img {
-            height: 40px;
             width: 40px;
+            height: 40px;
         }
 
         .form-wrapper {
@@ -62,14 +61,13 @@
         }
 
         .location-input {
-            position: relative;
             background: transparent;
             border: none;
             border-bottom: 2px solid rgba(255, 255, 255, 0.6);
             width: 400px;
             max-width: 100%;
             font-size: 20px;
-            color: white;
+            color: #fff;
             padding: 10px 0;
             outline: none;
             text-align: left;
@@ -79,7 +77,6 @@
         .location-input::placeholder {
             color: rgba(255, 255, 255, 0.6);
             font-size: 20px;
-            text-align: left;
         }
 
         @keyframes pulse-underline {
@@ -99,23 +96,22 @@
             padding: 15px 40px;
             font-size: 17px;
             font-weight: 300;
-            color: white;
+            color: #fff;
             background: linear-gradient(135deg, #330000 0%, #660000 50%, #330000 100%);
             border: none;
             border-radius: 15px;
-            font-family: 'Poppins', sans-serif;
-            transition: background 0.3s ease;
+            transition: background .3s;
         }
 
         .check-btn:hover {
-            background: #333333;
+            background: #333;
         }
 
         #result {
             margin-top: 45px;
             font-size: 24px;
             font-weight: 300;
-            color: white;
+            color: #fff;
             text-align: center;
             opacity: 0;
         }
@@ -124,8 +120,7 @@
             display: flex;
             gap: 25px;
             justify-content: center;
-            list-style-type: disc;
-            list-style-position: inside;
+            list-style: disc inside;
             margin-top: 10px;
             padding: 0;
         }
@@ -143,10 +138,9 @@
             z-index: 3;
         }
 
-        @media (max-width: 480px) {
+        @media(max-width:480px) {
             .header h1 {
                 font-size: 35px;
-                margin-top: 15px;
             }
 
             .location-input {
@@ -179,9 +173,7 @@
     </div>
     <script>
         const cursor = document.getElementById('cursor');
-        document.addEventListener('mousemove', e => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.4, ease: "power1.out" });
-        });
+        document.addEventListener('mousemove', e => gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.4, ease: "power1.out" }));
 
         const rawMap = {
             'Alabama': ['Bessemer', 'Dothan', 'Florence', 'Muscle Shoals', 'Russellville', 'Tuscaloosa'],
@@ -223,50 +215,37 @@
             'Wisconsin': ['Eau Claire', 'Green Bay', 'Milwaukee', 'Oshkosh/Appleton', 'Sheboygan', 'Stevens Point', 'Wausau']
         };
         const locationsByState = {};
-        for (let state in rawMap) {
-            locationsByState[state.toLowerCase()] = rawMap[state].map(c => c.toLowerCase());
-        }
+        Object.keys(rawMap).forEach(stateName => {
+            locationsByState[stateName.toLowerCase()] = rawMap[stateName].map(c => c.toLowerCase());
+        });
 
         document.getElementById('checkBtn').addEventListener('click', () => {
             const input = document.getElementById('locationInput').value.trim();
-            const resultEl = document.getElementById('result');
-            resultEl.innerHTML = '';
-            resultEl.style.opacity = 0;
+            const resultEl = document.getElementById('result'); resultEl.innerHTML = ''; resultEl.style.opacity = 0;
 
-            if (!/^[A-Za-z ,]+$/.test(input)) {
-                resultEl.textContent = 'Invalid input. Use letters only.'; return fadeIn();
-            }
+            if (!/^[A-Za-z ,]+$/.test(input)) { resultEl.textContent = 'Invalid input. Use letters only.'; return fadeIn(); }
 
             const parts = input.split(',').map(s => s.trim().toLowerCase());
-            if (parts.length < 2) {
-                resultEl.textContent = 'Please enter State and City.'; return fadeIn();
-            }
-            let [first, second] = parts;
-            let state, city;
-            if (locationsByState[first] && locationsByState[first].includes(second)) {
-                state = first; city = second;
-            } else if (locationsByState[second] && locationsByState[second].includes(first)) {
-                state = second; city = first;
-            } else {
-                resultEl.textContent = 'Unavailable'; return fadeIn();
-            }
+            if (parts.length < 2) { resultEl.textContent = 'Please enter State and City.'; return fadeIn(); }
+            let stateKey, cityKey;
+            if (locationsByState[parts[0]]) { stateKey = parts[0]; cityKey = parts[1]; }
+            else if (locationsByState[parts[1]]) { stateKey = parts[1]; cityKey = parts[0]; }
+            else { resultEl.textContent = 'Unavailable'; return fadeIn(); }
 
-            if (locationsByState[state].includes(city)) {
+            if (locationsByState[stateKey].includes(cityKey)) {
                 resultEl.textContent = 'Available';
             } else {
-                const opts = rawMap[state.charAt(0).toUpperCase() + state.slice(1)].slice(0, 3);
+                const properState = stateKey.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                const opts = rawMap[properState].slice(0, 3);
                 let html = 'Unfortunately your requested location is unavailable, but we do have other options:';
                 html += '<ul>';
-                opts.forEach(opt => html += `<li>${state.charAt(0).toUpperCase() + state.slice(1)}, ${opt}</li>`);
+                opts.forEach(opt => html += `<li>${properState}, ${opt}</li>`);
                 html += '</ul>';
                 resultEl.innerHTML = html;
             }
             fadeIn();
         });
-
-        function fadeIn() {
-            gsap.to('#result', { opacity: 1, duration: 0.5, ease: 'power1.out' });
-        }
+        function fadeIn() { gsap.to('#result', { opacity: 1, duration: 0.5, ease: 'power1.out' }); }
     </script>
 </body>
 
